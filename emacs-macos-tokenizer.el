@@ -61,14 +61,14 @@
 (defvar emt--root (file-name-directory (or load-file-name buffer-file-name))
   "The path to the root of the package.")
 
-(defvar emt--cjk-char-regex (format "\\W*\\(\\cc\\|\\cj\\|\\ch\\)+\\W*")
+(defvar emt--cjk-char-regex-forward (format "\\W*\\(\\cc\\|\\cj\\|\\ch\\)")
+  "Regex for CJK char.")
+
+(defvar emt--cjk-char-regex-backward (format "\\(\\cc\\|\\cj\\|\\ch\\)\\W*")
   "Regex for CJK char.")
 
 (defvar emt--lib-loaded nil
   "Whether dynamic module for emacs-macos-tokenizer is loaded.")
-
-(defvar emt--cache-lru-size 50
-  "The size of LRU cache for tokenization results.")
 
 (defvar emt--cache-set (make-hash-table :test #'equal)
   "The hash table for caching tokenization results.")
@@ -106,12 +106,12 @@ If DIRECTION is `'all', return the bounds of the string forward and backward."
   (let ((beg (point))
         (end (point)))
     (when (or (eq direction 'forward) (eq direction 'all))
-      (when (looking-at emt--cjk-char-regex)
+      (when (looking-at emt--cjk-char-regex-forward)
         (save-excursion
           (forward-word)
           (setq end (point)))))
     (when (or (eq direction 'backward) (eq direction 'all))
-      (when (looking-back emt--cjk-char-regex nil)
+      (when (looking-back emt--cjk-char-regex-backward nil)
         (save-excursion
           (backward-word)
           (setq beg (point)))))
@@ -166,7 +166,7 @@ If BACK is non-nil, return the word backward."
 
 If DIRECTION is `'forward', move point forward by word.
 If DIRECTION is `'backward', move point backward by word."
-  (let* ((bounds-at-point (emt--get-bounds-at-point direction))
+  (let* ((bounds-at-point (emt--get-bounds-at-point 'all))
          (beg (car bounds-at-point))
          (end (cdr bounds-at-point)))
     (if (eq beg end)
