@@ -4,13 +4,13 @@
 import PackageDescription
 
 let package = Package(
-  name: "emacsMacTokenizer",
+  name: "emacsMacOSTokenizer",
   platforms: [.macOS(.v10_15)],
   products: [
     .library(
-      name: "emacsMacTokenizer",
+      name: "emacsMacOSTokenizer",
       type: .dynamic,
-      targets: ["emacsMacTokenizer"]
+      targets: ["emacsMacOSTokenizer"]
     ),
   ],
   dependencies: [
@@ -18,7 +18,7 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "emacsMacTokenizer",
+      name: "emacsMacOSTokenizer",
       dependencies: [
         .product(name: "EmacsSwiftModule", package: "emacs-swift-module")
       ],

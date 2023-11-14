@@ -1,7 +1,7 @@
 import EmacsSwiftModule
 import NaturalLanguage
 
-class emacsMacTokenizer: Module {
+class emacsMacOSTokenizer: Module {
     typealias WordBound = ConsCell<Int, Int>
     typealias WordAndBound = ConsCell<String, ConsCell<Int, Int>>
 
@@ -77,5 +77,5 @@ class emacsMacTokenizer: Module {
 }
 
 func createModule() -> Module {
-    emacsMacTokenizer()
+    emacsMacOSTokenizer()
 }
