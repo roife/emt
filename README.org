@@ -90,6 +90,18 @@ It takes an optional argument =path=, which is the path to the directory of dyna
 
 Load dynamic module.
 
+**** =emt-split=
+
+Split string into a list of words.
+
+Return a list of cons, each of which has a word and its bound (a cons of the beginning position and the ending position of the word).
+
+**** =emt-split-without-bounds=
+
+Split string into a list of words. Just return a list of word.
+
+It is faster than =emt-split=.
+
 **** =emt-forward-word=
 
 CJK compatible version of =forward-word=.

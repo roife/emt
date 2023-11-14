@@ -210,7 +210,8 @@ If DIRECTION is `'backward', move point backward by word."
 (defun emt-split (str)
   "Split STR into a list of words.
 
-Return a list of cons, each of which has a word and its bound."
+Return a list of cons, each of which has a word and its bound (a cons of
+the beginning position and the ending position of the word)"
   (if emt--lib-loaded
       (if-let ((cached (and emt-use-cache (emt--cache-get str))))
           cached
@@ -220,7 +221,9 @@ Return a list of cons, each of which has a word and its bound."
     (error "Dynamic module not loaded")))
 
 (defun emt-split-without-bounds (str)
-  "Split STR into a list of words. Just return a list of word."
+  "Split STR into a list of words. Just return a list of word.
+
+It is faster than `emt-split'."
   (if emt--lib-loaded
       (if-let ((cached (and emt-use-cache (emt--cache-get str))))
           (mapcar #'car cached)
