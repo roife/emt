@@ -7,11 +7,17 @@ This dynamic module serves as an interface to invoke macOS's built-in NLP tokeni
 This module is written in Swift, and requires macOS 10.15 or later.
 
 #+begin_src bash
-  # For debug
-  swift build
-
   # For release
   swift build -c release
+
+  # For debug
+  swift build
+#+end_src
+
+If you enconter the error =No such module "PackageDescription"=, you should install Xcode and run the following command:
+
+#+begin_src bash
+  sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
 #+end_src
 
 ** Usage
@@ -33,7 +39,5 @@ The module provides three functions:
     This functions takes a string and a position, and returns the word at the position. If the position is at the bound of two words, it returns the word at the right side of that position.
 
 ** Acknowledgement
-
-This module is inspired by [[https://github.com/cireu/jieba.el/][jieba.el]] which is a Chinese tokenizer using `jieba`.
 
 This module uses [[https://github.com/SavchenkoValeriy/emacs-swift-module.git][emacs-swift-module]], which provides an interface for writing Emacs dynamic modules in Swift.

@@ -1,0 +1,106 @@
+* emacs-macos-tokenizer.el
+
+** Introduction
+
+This package use macOS's built-in NLP tokenizer to tokenize and operate on CJK words in Emacs.
+
+** Installation
+
+*** Requirements
+
+This package requires macOS 10.15 or later.
+
+This package also requires Emacs 26.1 or later, built with dynamic module support (i.e. use =--with-modules= while compilation Emacs).
+
+*** Install package
+
+Install with `straight` and `use-package`:
+
+#+begin_src emacs-lisp
+  (use-package emacs-macos-tokenizer
+    :straight (:host github :repo "roife/emacs-macos-tokenizer")
+    :hook (after-init . emacs-macos-tokenizer-mode))
+#+end_src
+
+*** Build dynamic module
+
+You can download pre-built module from [[https://github.com/roife/emacs-macos-tokenizer/releases][releases]], or build it yourself with the following step:
+
+- Install Xcode.
+- Build the module with `emacs-macos-tokenizer-compile-module`, which compiles and copy the module to =emacs-macos-tokenizer-lib-path=.
+
+If you enconter the error =No such module "PackageDescription"=, you should run the following command and try again:
+
+#+begin_src bash
+  sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+#+end_src
+
+** Customization
+
+*** =emacs-macos-tokenizer-use-cache=
+
+Caches for results of tokenization if non-nil. Default is =t=.
+
+*** =emacs-macos-tokenizer-cache-lru-size=
+
+The size of LRU cache. Default is =50=.
+
+*** =emacs-macos-tokenizer-lib-path=
+
+The path to the directory of dynamic library for emacs-macos-tokenizer. Default is =~/.emacs.d/modules/libemacsMacOSTokenizer.dylib=.
+
+** Usage
+
+*** keymap: =emacs-macos-tokenizer-mode-map=
+
+It remaps =forward-word=, =backward-word=, =kill-word= and =backward-kill-word= to use emacs-macos-tokenizer's version.
+
+*** Minor mode
+
+It calls =emacs-macos-tokenizer-ensure=, which load dynamic modeuls and set =emacs-macos-tokenizer-mode-map=.
+
+*** Functions
+
+**** =emacs-macos-tokenizer-word-at-point-or-forward=
+
+Return the word at point. If current point is at bound of a word, return the one forward.
+
+**** =emacs-macos-tokenizer-word-at-point-or-backward=
+
+Return the word at point. If current point is at bound of a word, return the one backward.
+
+**** =emacs-macos-tokenizer-compiler-module=
+
+Compile and copy the module to =emacs-macos-tokenizer-lib-path=.
+
+It takes an optional argument =path=, which is the path to the directory of dynamic library. By default, =path= is set to =emacs-macos-tokenizer-lib-path=.
+
+**** =emacs-macos-tokenizer-ensure=
+
+Load dynamic module.
+
+**** =emacs-macos-tokenizer-forward-word=
+
+CJK compatible version of `forward-word'.
+
+**** =emacs-macos-tokenizer-backward-word=
+
+CJK compatible version of `backward-word'.
+
+**** =emacs-macos-tokenizer-kill-word=
+
+CJK compatible version of `kill-word'.
+
+**** =emacs-macos-tokenizer-backward-kill-word=
+
+CJK compatible version of `backward-kill-word'.
+
+**** =emacs-macos-tokenizer-mark-word=
+
+CJK compatible version of `mark-word'.
+
+** Acknowledgements
+
+This package is inspired by [[https://github.com/cireu/jieba.el/][jieba.el]] which is a Chinese tokenizer for Emacs using `jieba`.
+
+The dynamic module uses [[https://github.com/SavchenkoValeriy/emacs-swift-module.git][emacs-swift-module]], which provides an interface for writing Emacs dynamic modules in Swift.
