@@ -63,6 +63,8 @@ class emacsMacOSTokenizer: Module {
         try env.defun(self.funcName("do-split-without-bounds"),
                       with: """
                             Split ARG1 into a list of words.
+
+                            It is faster than `do-split' while it does not calculate bounds.
                             """,
                       function: self.splitWithoutBoundsHelper(text:))
 

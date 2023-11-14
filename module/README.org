@@ -1,0 +1,39 @@
+* emacs-macos-tokenizer
+
+This dynamic module serves as an interface to invoke macOS's built-in NLP tokenizer, specifically the =NLTokenizer=.
+
+** Build
+
+This module is written in Swift, and requires macOS 10.15 or later.
+
+#+begin_src bash
+  # For debug
+  swift build
+
+  # For release
+  swift build -c release
+#+end_src
+
+** Usage
+
+The module provides three functions:
+
+- =emacs-macos-tokenizer--do-split-helper=
+
+    This function takes a string intended for tokenization, and returns a list of ConsCell, which contains the word and its bounds.
+  
+- =emacs-macos-tokenizer--do-split-without-bounds=
+
+    This function takes a string intended for tokenization, and returns a list of words.
+
+    While this function does not calculate the bounds of the words, it is faster than =emacs-macos-tokenizer--do-split-helper=.
+
+- =emacs-macos-tokenizer--word-at-point-or-forward=
+
+    This functions takes a string and a position, and returns the word at the position. If the position is at the bound of two words, it returns the word at the right side of that position.
+
+** Acknowledgement
+
+This module is inspired by [jieba.el](https://github.com/cireu/jieba.el/), which is a Chinese tokenizer using `jieba`.
+
+This module uses [emacs-swift-module](https://github.com/SavchenkoValeriy/emacs-swift-module.git), which provides an interface for writing Emacs dynamic modules in Swift.
