@@ -1,6 +1,6 @@
 .DS_Store
-/.build
-/Packages
+/module/.build
+/module/Packages
 /*.xcodeproj
 xcuserdata/
 DerivedData/
