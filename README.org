@@ -19,6 +19,8 @@ This package use macOS's built-in NLP tokenizer to tokenize and operate on CJK w
 
 Retrieve the pre-built module from the [[https://github.com/roife/emacs-macos-tokenizer/releases][releases]] section and place the =dylib= file in the =emacs-macos-tokenizer-lib-path= (by default, it is located at =modules/libEMT.dylib= within your personal configuration folder, normally =~/.emacs.d/modules/libEMT.dylib=).
 
+*Current version of the dynamic module is =v2.0.0=, make sure you have updated to latest module.*
+
 **** Manually build
 
 - Install Xcode.
@@ -80,7 +82,7 @@ Return the word at point. If current point is at bound of a word, return the one
 
 Return the word at point. If current point is at bound of a word, return the one backward.
 
-**** =emt-compiler-module=
+**** =emt-compile-module=
 
 Compile and copy the module to =emt-lib-path=.
 
@@ -94,13 +96,7 @@ Load dynamic module.
 
 Split string into a list of words.
 
-Return a list of cons, each of which has a word and its bound (a cons of the beginning position and the ending position of the word).
-
-**** =emt-split-without-bounds=
-
-Split string into a list of words. Just return a list of word.
-
-It is faster than =emt-split=.
+Return a list of word bounds (a cons of the beginning position and the ending position of a word)
 
 **** =emt-forward-word=
 

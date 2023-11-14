@@ -4,7 +4,7 @@
 
 ;; Author: Roife Wu <roifewu@gmail.com>
 ;; URL: https://github.com/cireu/jieba.el
-;; Version: 0.0.1
+;; Version: 2.0.0
 ;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: chinese, cjk, tokenizer, macos, mac, natural language, segmentation
 
@@ -63,8 +63,11 @@
 (defvar emt--root (file-name-directory (or load-file-name buffer-file-name))
   "The path to the root of the package.")
 
-(defvar emt--cjk-char-regex (format "^\\W*\\(\\cc\\|\\cj\\|\\ch\\)+\\W*$")
-  "Regex for CJK char.")
+(defvar emt--cjk-regex-forward (format "\\(\\cc\\|\\cj\\|\\ch\\)+\\W*$")
+  "Forward regex for CJK.")
+
+(defvar emt--cjk-regex-backward (format "^\\W*\\(\\cc\\|\\cj\\|\\ch\\)+")
+  "Backward regex for CJK.")
 
 (defvar emt--lib-loaded nil
   "Whether dynamic module for emt is loaded.")
@@ -77,7 +80,6 @@
 
 (defvar emt--lib-fns
   '(emt--do-split-helper
-    emt--do-split-without-bounds-helper
     emt--word-at-point-or-forward-helper)
   "The list of functions in dynamic module.")
 
@@ -91,11 +93,10 @@
       (when value
         (setq emt--cache-lru-list (delete key emt--cache-lru-list))
         (push key emt--cache-lru-list))
-      (if (zerop leading) value
-        (mapcar #'(lambda (pair)
-                    (cons (car pair)
-                          (cons (+ leading (cadr pair))
-                                (+ leading (cddr pair)))))
+      (if (zerop leading)
+          value
+        (mapcar #'(lambda (pair) (cons (+ (car pair) leading)
+                                  (+ (cdr pair) leading)))
                 value)))))
 
 (defun emt--cache-put (key value)
@@ -104,10 +105,8 @@
     (when (zerop (string-match "\\W*" key))
       (setq leading (match-end 0)))
     (unless (zerop leading)
-      (setq value (mapcar #'(lambda (pair)
-                              (cons (car pair)
-                                    (cons (- (cadr pair) leading)
-                                          (- (cddr pair) leading))))
+      (setq value (mapcar #'(lambda (pair) (cons (- (car pair) leading)
+                                            (- (cdr pair) leading)))
                           value)))
     (setq key (string-trim (substring-no-properties key) "\\W*" "\\W*"))
     (puthash key value emt--cache-set)
@@ -127,33 +126,27 @@ If DIRECTION is `'all', return the bounds of the string forward and backward."
     (when (or (eq direction 'forward) (eq direction 'all))
       (save-excursion
         (forward-word)
-        (when (string-match-p emt--cjk-char-regex
+        (when (string-match-p emt--cjk-regex-forward
                               (buffer-substring-no-properties pos (point)))
           (setq end (point)))))
     (when (or (eq direction 'backward) (eq direction 'all))
       (save-excursion
         (backward-word)
-        (when (string-match-p emt--cjk-char-regex
+        (when (string-match-p emt--cjk-regex-backward
                               (buffer-substring-no-properties (point) pos))
           (setq beg (point)))))
     (cons beg end)))
 
-(defun emt--word-at-point-helper (back)
+(defun emt--word-at-point (back)
   "Return the word at point.
 
 If BACK is non-nil, return the word backward."
   (unless emt--lib-loaded (error "Dynamic module not loaded"))
-  (let* ((bounds (emt--get-bounds-at-point 'all))
-         (beg (car bounds))
-         (end (cdr bounds))
-         (index (- (point) beg))
-         (wordAndRange (emt--word-at-point-or-forward-helper
-                        (buffer-substring-no-properties beg end)
-                        (if (and back (> index 0))
-                            (1- index)
-                          index)))
-         (word-beg (cadr wordAndRange))
-         (word-end (cddr wordAndRange)))
+  (pcase-let* ((`(,beg . ,end) (emt--get-bounds-at-point 'all))
+               (index (- (point) beg))
+               (`(,word-beg . ,word-end) (emt--word-at-point-or-forward-helper
+                                          (buffer-substring-no-properties beg end)
+                                          (if (and back (> index 0)) (1- index) index))))
     (if (eq word-beg word-end)
         (word-at-point)
       (buffer-substring (+ beg word-beg) (+ beg word-end)))))
@@ -182,53 +175,47 @@ If BACK is non-nil, return the word backward."
             (setq start (1+ start)))))
       (elt vec end))))
 
+(defun emt--move-by-word-decide-bounds-direction (direction)
+  "Decide the direction when moving by word."
+  (if (eq direction 'forward)
+      (if (and (char-after) (string-match "\\W" (char-to-string (char-after))))
+          'forward
+        'all)
+    (if (and (char-before) (string-match "\\W" (char-to-string (char-before))))
+        'backward
+      'all)))
+
 (defun emt--move-by-word (direction)
   "Move point by word.
 
 If DIRECTION is `'forward', move point forward by word.
 If DIRECTION is `'backward', move point backward by word."
-  (let* ((bounds-at-point (emt--get-bounds-at-point 'all))
-         (beg (car bounds-at-point))
-         (end (cdr bounds-at-point)))
+  (pcase-let ((for-p (eq direction 'forward))
+              (`(,beg . ,end) (emt--get-bounds-at-point
+                               (emt--move-by-word-decide-bounds-direction direction))))
     (if (eq beg end)
-        (if (eq direction 'forward) (forward-word) (backward-word))
-      (let* ((text (buffer-substring-no-properties (car bounds-at-point) (cdr bounds-at-point)))
-             (results (emt-split text))
+        (if for-p (forward-word) (backward-word))
+      (let* ((text (buffer-substring-no-properties beg end))
              (pos (- (point) beg))
-             target-bound)
-        (cond ((eq direction 'forward)
-               (setq target-bound (emt--lowerbound (lambda (x) (> (cddr x) pos)) results))
-               (if (and target-bound (> (cddr target-bound) pos))
-                   (goto-char (+ beg (cddr target-bound)))
-                 (forward-word)))
-              (t (setq target-bound (emt--upperbound (lambda (x) (< (cadr x) pos)) results))
-                 (if (and target-bound (< (cadr target-bound) pos))
-                     (goto-char (+ beg (cadr target-bound)))
-                   (backward-word)))))))
+             (pred (if for-p (lambda (x) (> x pos)) (lambda (x) (< x pos))))
+             (target-bound (funcall (if for-p #'emt--lowerbound #'emt--upperbound)
+                                    pred
+                                    (mapcar (if for-p #'cdr #'car) (emt-split text)))))
+        (if (and target-bound (funcall pred target-bound))
+            (goto-char (+ beg target-bound))
+          (if for-p (forward-word) (backward-word))))))
   t)
 
 (defun emt-split (str)
   "Split STR into a list of words.
 
-Return a list of cons, each of which has a word and its bound (a cons of
-the beginning position and the ending position of the word)"
+Return a list of word bounds (a cons of the beginning position and the ending
+position of a word)"
   (if emt--lib-loaded
       (if-let ((cached (and emt-use-cache (emt--cache-get str))))
           cached
         (let ((result (emt--do-split-helper str)))
           (when emt-use-cache (emt--cache-put str result))
-          result))
-    (error "Dynamic module not loaded")))
-
-(defun emt-split-without-bounds (str)
-  "Split STR into a list of words. Just return a list of word.
-
-It is faster than `emt-split'."
-  (if emt--lib-loaded
-      (if-let ((cached (and emt-use-cache (emt--cache-get str))))
-          (mapcar #'car cached)
-        (let ((result (emt--do-split-without-bounds-helper str)))
-          (when emt-use-cache (emt--cache-put str (cons result nil)))
           result))
     (error "Dynamic module not loaded")))
 
@@ -238,7 +225,7 @@ It is faster than `emt-split'."
 
 If current point is at bound of a word, return the one forward."
   (interactive)
-  (emt--word-at-point-helper nil))
+  (emt--word-at-point nil))
 
 ;;;###autoload
 (defun emt-word-at-point-or-backward ()
@@ -246,10 +233,10 @@ If current point is at bound of a word, return the one forward."
 
 If current point is at bound of a word, return the one backward."
   (interactive)
-  (emt--word-at-point-helper t))
+  (emt--word-at-point t))
 
 ;;;###autoload
-(defun emt-compiler-module (&optional path)
+(defun emt-compile-module (&optional path)
   "Compile dynamic module."
   (interactive)
   (unless (eq system-type 'darwin)
