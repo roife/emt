@@ -28,21 +28,15 @@ run the following command and try again:
 
 ** Usage
 
-The module provides three functions:
+The module provides two functions:
 
 - =emt--do-split-helper=
 
-    This function takes a string intended for tokenization, and returns a list of ConsCell, which contains the word and its bounds.
-  
-- =emt--do-split-without-bounds=
-
-    This function takes a string intended for tokenization, and returns a list of words.
-
-    While this function does not calculate the bounds of the words, it is faster than =emt--do-split-helper=.
+    This function takes a string and return an array of bounds. A bound is a cons with the starting position and the ending position of a word.
 
 - =emt--word-at-point-or-forward=
 
-    This functions takes a string and a position, and returns the word at the position. If the position is at the bound of two words, it returns the word at the right side of that position.
+    This functions takes a string and a position, and returns the bound of the word at the position. If the position is at bound of two words, it returns the word at the right side of that position. This function does not tokenize the whole string, so it is faster in some cases.
 
 ** Acknowledgement
 
