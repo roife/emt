@@ -40,15 +40,17 @@
   :prefix "emacs-macos-tokenizer-")
 
 (defcustom emt-use-cache t
-  "Use cache for results of tokenization if non-nil."
+  "Caches for results of tokenization if non-nil."
   :type 'boolean
   :group 'emacs-macos-tokenizer)
 
-(defcustom emt-lib-path (concat user-emacs-directory "modules/libemacsMacOSTokenizer" module-file-suffix)
-  "The path to the directory of dynamic library for emacs-macos-tokenizer.
+(defcustom emt--cache-lru-size 50
+  "The size of LRU cache for tokenization results."
+  :type 'integer
+  :group 'emacs-macos-tokenizer)
 
-Leave it nil if you have the dynamic library in the standard path. Otherwise
-you should set this to where you put the dynamic library."
+(defcustom emt-lib-path (concat user-emacs-directory "modules/libemacsMacOSTokenizer" module-file-suffix)
+  "The path to the directory of dynamic library for emacs-macos-tokenizer."
   :type 'string
   :group 'emacs-macos-tokenizer)
 
