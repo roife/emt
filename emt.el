@@ -83,20 +83,37 @@
 
 (defun emt--cache-get (key)
   "Get the value of KEY in cache."
-  (setq key (string-trim (substring-no-properties key) "\\W*" "\\W*"))
-  (let ((value (gethash key emt--cache-set)))
-    (when value
-      (setq emt--cache-lru-list (delete key emt--cache-lru-list))
-      (push key emt--cache-lru-list))
-    value))
+  (let ((leading 0))
+    (when (zerop (string-match "\\W*" key))
+      (setq leading (match-end 0)))
+    (setq key (string-trim (substring-no-properties key) "\\W*" "\\W*"))
+    (let ((value (gethash key emt--cache-set)))
+      (when value
+        (setq emt--cache-lru-list (delete key emt--cache-lru-list))
+        (push key emt--cache-lru-list))
+      (if (zerop leading) value
+        (mapcar #'(lambda (pair)
+                    (cons (car pair)
+                          (cons (+ leading (cadr pair))
+                                (+ leading (cddr pair)))))
+                value)))))
 
 (defun emt--cache-put (key value)
   "Put KEY and VALUE into cache."
-  (setq key (string-trim (substring-no-properties key) "\\W*" "\\W*"))
-  (puthash key value emt--cache-set)
-  (push key emt--cache-lru-list)
-  (when (> (length emt--cache-lru-list) emt--cache-lru-size)
-    (setq emt--cache-lru-list (butlast emt--cache-lru-list))))
+  (let ((leading 0))
+    (when (zerop (string-match "\\W*" key))
+      (setq leading (match-end 0)))
+    (unless (zerop leading)
+      (setq value (mapcar #'(lambda (pair)
+                              (cons (car pair)
+                                    (cons (- (cadr pair) leading)
+                                          (- (cddr pair) leading))))
+                          value)))
+    (setq key (string-trim (substring-no-properties key) "\\W*" "\\W*"))
+    (puthash key value emt--cache-set)
+    (push key emt--cache-lru-list)
+    (when (> (length emt--cache-lru-list) emt--cache-lru-size)
+      (setq emt--cache-lru-list (butlast emt--cache-lru-list)))))
 
 (defun emt--get-bounds-at-point (direction)
   "Get the bounds of the CJK string at point.
@@ -143,7 +160,7 @@ If BACK is non-nil, return the word backward."
 
 (defun emt--upperbound (pred vec)
   "Binary search to find the last element in VEC satisfying PRED."
-  (if (null vec) nil
+  (if (zerop (length vec)) nil
     (let ((start 0)
           (end (1- (length vec))))
       (while (< start end)
@@ -155,7 +172,7 @@ If BACK is non-nil, return the word backward."
 
 (defun emt--lowerbound (pred vec)
   "Binary search to find the first element in VEC satisfying PRED."
-  (if (null vec) nil
+  (if (zerop (length vec)) nil
     (let ((start 0)
           (end (1- (length vec))))
       (while (< start end)
@@ -197,9 +214,9 @@ Return a list of cons, each of which has a word and its bound."
   (if emt--lib-loaded
       (if-let ((cached (and emt-use-cache (emt--cache-get str))))
           cached
-          (let ((result (emt--do-split-helper str)))
-            (when emt-use-cache (emt--cache-put str result))
-            result))
+        (let ((result (emt--do-split-helper str)))
+          (when emt-use-cache (emt--cache-put str result))
+          result))
     (error "Dynamic module not loaded")))
 
 (defun emt-split-without-bounds (str)
