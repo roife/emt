@@ -63,10 +63,7 @@
 (defvar emt--root (file-name-directory (or load-file-name buffer-file-name))
   "The path to the root of the package.")
 
-(defvar emt--cjk-char-regex-forward (format "\\W*\\(\\cc\\|\\cj\\|\\ch\\)")
-  "Regex for CJK char.")
-
-(defvar emt--cjk-char-regex-backward (format "\\(\\cc\\|\\cj\\|\\ch\\)\\W*")
+(defvar emt--cjk-char-regex (format "^\\W*\\(\\cc\\|\\cj\\|\\ch\\)+\\W*$")
   "Regex for CJK char.")
 
 (defvar emt--lib-loaded nil
@@ -107,17 +104,20 @@
 If DIRECTION is `'forward', return the bounds of the string forward.
 If DIRECTION is `'backward', return the bounds of the string backward.
 If DIRECTION is `'all', return the bounds of the string forward and backward."
-  (let ((beg (point))
-        (end (point)))
+  (let* ((pos (point))
+         (beg pos)
+         (end pos))
     (when (or (eq direction 'forward) (eq direction 'all))
-      (when (looking-at emt--cjk-char-regex-forward)
-        (save-excursion
-          (forward-word)
+      (save-excursion
+        (forward-word)
+        (when (string-match-p emt--cjk-char-regex
+                              (buffer-substring-no-properties pos (point)))
           (setq end (point)))))
     (when (or (eq direction 'backward) (eq direction 'all))
-      (when (looking-back emt--cjk-char-regex-backward nil)
-        (save-excursion
-          (backward-word)
+      (save-excursion
+        (backward-word)
+        (when (string-match-p emt--cjk-char-regex
+                              (buffer-substring-no-properties (point) pos))
           (setq beg (point)))))
     (cons beg end)))
 
