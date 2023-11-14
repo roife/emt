@@ -34,6 +34,6 @@ The module provides three functions:
 
 ** Acknowledgement
 
-This module is inspired by [jieba.el](https://github.com/cireu/jieba.el/), which is a Chinese tokenizer using `jieba`.
+This module is inspired by [[https://github.com/cireu/jieba.el/][jieba.el]] which is a Chinese tokenizer using `jieba`.
 
-This module uses [emacs-swift-module](https://github.com/SavchenkoValeriy/emacs-swift-module.git), which provides an interface for writing Emacs dynamic modules in Swift.
+This module uses [[https://github.com/SavchenkoValeriy/emacs-swift-module.git][emacs-swift-module]], which provides an interface for writing Emacs dynamic modules in Swift.
