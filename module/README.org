@@ -14,7 +14,13 @@ This module is written in Swift, and requires macOS 10.15 or later.
   swift build
 #+end_src
 
-If you enconter the error =No such module "PackageDescription"=, you should install Xcode and run the following command:
+If you enconter the folloing error:
+
+#+begin_quote
+No such module "PackageDescription"
+#+end_quote
+
+run the following command and try again:
 
 #+begin_src bash
   sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer

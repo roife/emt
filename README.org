@@ -24,7 +24,7 @@ Retrieve the pre-built module from the [[https://github.com/roife/emacs-macos-to
 - Install Xcode.
 - Build the module using =emt-compile-module=, which compiles and copies the module to =emt-lib-path=.
 
-If you enconter the folloing error,
+If you enconter the folloing error:
 
 #+begin_quote
 No such module "PackageDescription"
