@@ -1,4 +1,4 @@
-;;; emacs-macos-tokenizer.el  --- Tokenizing CJK words and symbols with macOS's built-in NLP tokenizer  -*- lexical-binding: t; -*-
+;;; emt.el  --- Tokenizing CJK words and symbols with macOS's built-in NLP tokenizer  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2023 Roife Wu
 
@@ -25,6 +25,7 @@
 
 ;;; Commentary:
 
+;; EMT stands for Emacs MacOS Tokenizer.
 ;; This package use macOS's built-in NLP tokenizer to tokenize and operate on
 ;; CJK words in Emacs.
 
@@ -34,25 +35,25 @@
 
 ;;; Customize
 
-(defgroup emacs-macos-tokenizer ()
+(defgroup emt ()
   "Tokenize CJK words with macOS's built-in NLP tokenizer."
   :group 'chinese
-  :prefix "emacs-macos-tokenizer-")
+  :prefix "emt-")
 
 (defcustom emt-use-cache t
   "Caches for results of tokenization if non-nil."
   :type 'boolean
-  :group 'emacs-macos-tokenizer)
+  :group 'emt)
 
 (defcustom emt--cache-lru-size 50
   "The size of LRU cache for tokenization results."
   :type 'integer
-  :group 'emacs-macos-tokenizer)
+  :group 'emt)
 
-(defcustom emt-lib-path (concat user-emacs-directory "modules/libemacsMacOSTokenizer" module-file-suffix)
-  "The path to the directory of dynamic library for emacs-macos-tokenizer."
+(defcustom emt-lib-path (concat user-emacs-directory "modules/libEMT" module-file-suffix)
+  "The path to the directory of dynamic library for emt."
   :type 'string
-  :group 'emacs-macos-tokenizer)
+  :group 'emt)
 
 ;;; Export function
 
@@ -68,7 +69,7 @@
   "Regex for CJK char.")
 
 (defvar emt--lib-loaded nil
-  "Whether dynamic module for emacs-macos-tokenizer is loaded.")
+  "Whether dynamic module for emt is loaded.")
 
 (defvar emt--cache-set (make-hash-table :test #'equal)
   "The hash table for caching tokenization results.")
@@ -242,7 +243,7 @@ If current point is at bound of a word, return the one backward."
     (if (zerop (shell-command "swift build -c release"))
         (progn (message "Compile succeed!")
                (make-directory (file-name-directory path) t)
-               (copy-file (concat emt--root "module/.build/release/libemacsMacOSTokenizer" module-file-suffix)
+               (copy-file (concat emt--root "module/.build/release/libEMT" module-file-suffix)
                           path t))
       (error "Compile dynamic module failed"))))
 
@@ -324,13 +325,9 @@ Set mark ARG words from point or move mark one word."
   "Minor mode for tokenizing CJK words with macOS's built-in NLP tokenizer."
   :global t
   :keymap emt-mode-map
-  :lighter "emacs-macos-tokenizer"
+  :lighter "emt"
   (when emt-mode (emt-ensure)))
 
-(provide 'emacs-macos-tokenizer)
+(provide 'emt)
 
-;;; emacs-macos-tokenizer.el ends here
-
-;; Local Variables:
-;; read-symbol-shorthands: (("emt-" . "emacs-macos-tokenizer-"))
-;; End:
+;;; emt.el ends here

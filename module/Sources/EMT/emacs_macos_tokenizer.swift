@@ -1,7 +1,7 @@
 import EmacsSwiftModule
 import NaturalLanguage
 
-class emacsMacOSTokenizer: Module {
+class EMT: Module {
     typealias WordBound = ConsCell<Int, Int>
     typealias WordAndBound = ConsCell<String, ConsCell<Int, Int>>
 
@@ -9,7 +9,7 @@ class emacsMacOSTokenizer: Module {
     let tokenizer = NLTokenizer(unit: .word)
 
     func funcName(_ name: String) -> String {
-        let funcNamePrefix = "emacs-macos-tokenizer--"
+        let funcNamePrefix = "emt--"
         let funcNameSuffix = "-helper"
         return funcNamePrefix + name + funcNameSuffix
     }
@@ -79,5 +79,5 @@ class emacsMacOSTokenizer: Module {
 }
 
 func createModule() -> Module {
-    emacsMacOSTokenizer()
+    EMT()
 }

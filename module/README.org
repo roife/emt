@@ -1,4 +1,4 @@
-* emacs-macos-tokenizer
+* emt
 
 This dynamic module serves as an interface to invoke macOS's built-in NLP tokenizer, specifically the =NLTokenizer=.
 
@@ -24,17 +24,17 @@ If you enconter the error =No such module "PackageDescription"=, you should inst
 
 The module provides three functions:
 
-- =emacs-macos-tokenizer--do-split-helper=
+- =emt--do-split-helper=
 
     This function takes a string intended for tokenization, and returns a list of ConsCell, which contains the word and its bounds.
   
-- =emacs-macos-tokenizer--do-split-without-bounds=
+- =emt--do-split-without-bounds=
 
     This function takes a string intended for tokenization, and returns a list of words.
 
-    While this function does not calculate the bounds of the words, it is faster than =emacs-macos-tokenizer--do-split-helper=.
+    While this function does not calculate the bounds of the words, it is faster than =emt--do-split-helper=.
 
-- =emacs-macos-tokenizer--word-at-point-or-forward=
+- =emt--word-at-point-or-forward=
 
     This functions takes a string and a position, and returns the word at the position. If the position is at the bound of two words, it returns the word at the right side of that position.
 

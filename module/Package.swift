@@ -4,13 +4,13 @@
 import PackageDescription
 
 let package = Package(
-  name: "emacsMacOSTokenizer",
+  name: "EMT",
   platforms: [.macOS(.v10_15)],
   products: [
     .library(
-      name: "emacsMacOSTokenizer",
+      name: "EMT",
       type: .dynamic,
-      targets: ["emacsMacOSTokenizer"]
+      targets: ["EMT"]
     ),
   ],
   dependencies: [
@@ -18,7 +18,7 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "emacsMacOSTokenizer",
+      name: "EMT",
       dependencies: [
         .product(name: "EmacsSwiftModule", package: "emacs-swift-module")
       ],

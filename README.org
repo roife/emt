@@ -1,6 +1,8 @@
-* emacs-macos-tokenizer.el
+* emt.el
 
 ** Introduction
+
+EMT stands for =Emacs MacOS Tokenizer=.
 
 This package use macOS's built-in NLP tokenizer to tokenize and operate on CJK words in Emacs.
 
@@ -16,9 +18,9 @@ This package use macOS's built-in NLP tokenizer to tokenize and operate on CJK w
 Install with =straight= and =use-package=:
 
 #+begin_src emacs-lisp
-  (use-package emacs-macos-tokenizer
-    :straight (:host github :repo "roife/emacs-macos-tokenizer")
-    :hook (after-init . emacs-macos-tokenizer-mode))
+  (use-package emt
+    :straight (:host github :repo "roife/emt")
+    :hook (after-init . emt-mode))
 #+end_src
 
 *** Build dynamic module
@@ -30,7 +32,7 @@ Retrieve the pre-built module from the [[https://github.com/roife/emacs-macos-to
 **** Manually build
 
 - Install Xcode.
-- Build the module using =emacs-macos-tokenizer-compile-module=, which compiles and copies the module to =emacs-macos-tokenizer-lib-path=.
+- Build the module using =emt-compile-module=, which compiles and copies the module to =emt-lib-path=.
 
 If you enconter the folloing error,
 
@@ -46,65 +48,65 @@ run the following command and try again:
 
 ** Customization
 
-*** =emacs-macos-tokenizer-use-cache=
+*** =emt-use-cache=
 
 Caches for results of tokenization if non-nil. Default is =t=.
 
-*** =emacs-macos-tokenizer-cache-lru-size=
+*** =emt-cache-lru-size=
 
 The size of LRU cache. Default is =50=.
 
-*** =emacs-macos-tokenizer-lib-path=
+*** =emt-lib-path=
 
-The path to the directory of dynamic library for emacs-macos-tokenizer. Default is =~/.emacs.d/modules/libemacsMacOSTokenizer.dylib=.
+The path to the directory of dynamic library for emt. Default is =~/.emacs.d/modules/libEMT.dylib=.
 
 ** Usage
 
-*** keymap: =emacs-macos-tokenizer-mode-map=
+*** keymap: =emt-mode-map=
 
-It remaps =forward-word=, =backward-word=, =kill-word= and =backward-kill-word= to use emacs-macos-tokenizer's version.
+It remaps =forward-word=, =backward-word=, =kill-word= and =backward-kill-word= to use emt's version.
 
 *** Minor mode
 
-It calls =emacs-macos-tokenizer-ensure=, which load dynamic modeuls and set =emacs-macos-tokenizer-mode-map=.
+It calls =emt-ensure=, which load dynamic modeuls and set =emt-mode-map=.
 
 *** Functions
 
-**** =emacs-macos-tokenizer-word-at-point-or-forward=
+**** =emt-word-at-point-or-forward=
 
 Return the word at point. If current point is at bound of a word, return the one forward.
 
-**** =emacs-macos-tokenizer-word-at-point-or-backward=
+**** =emt-word-at-point-or-backward=
 
 Return the word at point. If current point is at bound of a word, return the one backward.
 
-**** =emacs-macos-tokenizer-compiler-module=
+**** =emt-compiler-module=
 
-Compile and copy the module to =emacs-macos-tokenizer-lib-path=.
+Compile and copy the module to =emt-lib-path=.
 
-It takes an optional argument =path=, which is the path to the directory of dynamic library. By default, =path= is set to =emacs-macos-tokenizer-lib-path=.
+It takes an optional argument =path=, which is the path to the directory of dynamic library. By default, =path= is set to =emt-lib-path=.
 
-**** =emacs-macos-tokenizer-ensure=
+**** =emt-ensure=
 
 Load dynamic module.
 
-**** =emacs-macos-tokenizer-forward-word=
+**** =emt-forward-word=
 
 CJK compatible version of =forward-word=.
 
-**** =emacs-macos-tokenizer-backward-word=
+**** =emt-backward-word=
 
 CJK compatible version of =backward-word=.
 
-**** =emacs-macos-tokenizer-kill-word=
+**** =emt-kill-word=
 
 CJK compatible version of =kill-word=.
 
-**** =emacs-macos-tokenizer-backward-kill-word=
+**** =emt-backward-kill-word=
 
 CJK compatible version of =backward-kill-word=.
 
-**** =emacs-macos-tokenizer-mark-word=
+**** =emt-mark-word=
 
 CJK compatible version of =mark-word=.
 
