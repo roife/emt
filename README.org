@@ -27,7 +27,7 @@ Install with =straight= and =use-package=:
 
 **** Pre-built (recommendation)
 
-Retrieve the pre-built module from the [[https://github.com/roife/emacs-macos-tokenizer/releases][releases]] section and place the =dylib= file in the =emacs-macos-tokenizer-lib-path= (by default, it is located at =modules/libemacsMacOSTokenizer.dylib= within your personal configuration folder, normally =~/.emacs.d/modules/libemacsMacOSTokenizer.dylib=).
+Retrieve the pre-built module from the [[https://github.com/roife/emacs-macos-tokenizer/releases][releases]] section and place the =dylib= file in the =emacs-macos-tokenizer-lib-path= (by default, it is located at =modules/libEMT.dylib= within your personal configuration folder, normally =~/.emacs.d/modules/libEMT.dylib=).
 
 **** Manually build
 
