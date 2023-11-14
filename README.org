@@ -13,16 +13,6 @@ This package use macOS's built-in NLP tokenizer to tokenize and operate on CJK w
 - macOS 10.15 or later
 - Emacs 26.1 or later, built with dynamic module support (use =--with-modules= during compilation)
 
-*** Install package
-
-Install with =straight= and =use-package=:
-
-#+begin_src emacs-lisp
-  (use-package emt
-    :straight (:host github :repo "roife/emt")
-    :hook (after-init . emt-mode))
-#+end_src
-
 *** Build dynamic module
 
 **** Pre-built (recommendation)
@@ -44,6 +34,16 @@ run the following command and try again:
 
 #+begin_src bash
   sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+#+end_src
+
+*** Install package
+
+Install with =straight= and =use-package=:
+
+#+begin_src emacs-lisp
+  (use-package emt
+    :straight (:host github :repo "roife/emt")
+    :hook (after-init . emt-mode))
 #+end_src
 
 ** Customization
