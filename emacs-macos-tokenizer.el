@@ -30,8 +30,7 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'cl-lib))
+(eval-when-compile (require 'thingatpt))
 
 ;;; Customize
 
@@ -40,7 +39,6 @@
   :group 'chinese
   :prefix "emacs-macos-tokenizer-")
 
-;; TODO: LRU cache size
 (defcustom emt-use-cache t
   "Use cache for results of tokenization if non-nil."
   :type 'boolean
@@ -133,11 +131,10 @@ Return a list of cons, each of which has a word and its bound."
 (defun emt--get-bounds-at-point (direction)
   "Get the bounds of the CJK string at point.
 
-If DIRECTION is 'forward, return the bounds of the string forward.
-If DIRECTION is 'backward, return the bounds of the string backward.
-If DIRECTION is 'all, return the bounds of the string forward and backward."
-  (let ((pos (point))
-        (beg (point))
+If DIRECTION is `'forward', return the bounds of the string forward.
+If DIRECTION is `'backward', return the bounds of the string backward.
+If DIRECTION is `'all', return the bounds of the string forward and backward."
+  (let ((beg (point))
         (end (point)))
     (when (or (eq direction 'forward) (eq direction 'all))
       (when (looking-at emt--cjk-char-regex)
@@ -145,13 +142,16 @@ If DIRECTION is 'all, return the bounds of the string forward and backward."
           (forward-word)
           (setq end (point)))))
     (when (or (eq direction 'backward) (eq direction 'all))
-      (when (looking-back emt--cjk-char-regex)
+      (when (looking-back emt--cjk-char-regex nil)
         (save-excursion
           (backward-word)
           (setq beg (point)))))
     (cons beg end)))
 
 (defun emt--word-at-point-helper (back)
+  "Return the word at point.
+
+If BACK is non-nil, return the word backward."
   (unless emt--lib-loaded (error "Dynamic module not loaded"))
   (let* ((bounds (emt--get-bounds-at-point 'all))
          (beg (car bounds))
@@ -169,42 +169,46 @@ If DIRECTION is 'all, return the bounds of the string forward and backward."
       (buffer-substring (+ beg word-beg) (+ beg word-end)))))
 
 (defun emt-word-at-point-or-forward ()
-  "Return the word at point in STR.
+  "Return the word at point.
 
 If current point is at bound of a word, return the one forward."
   (emt--word-at-point-helper nil))
 
 (defun emt-word-at-point-or-backward ()
-  "Return the word at point in STR.
+  "Return the word at point.
 
 If current point is at bound of a word, return the one backward."
   (emt--word-at-point-helper t))
 
 (defun emt--upperbound (pred vec)
-  "Binary search to find the last element in LIST satisfying PRED."
+  "Binary search to find the last element in VEC satisfying PRED."
   (if (null vec) nil
-    (setq start 0)
-    (setq end (1- (length vec)))
-    (while (< start end)
-      (let ((mid (ash (+ start end 1) -1)))
-        (if (funcall pred (elt vec mid))
-            (setq start mid)
-          (setq end (1- mid)))))
-    (elt vec start)))
+    (let ((start 0)
+          (end (1- (length vec))))
+      (while (< start end)
+        (let ((mid (ash (+ start end 1) -1)))
+          (if (funcall pred (elt vec mid))
+              (setq start mid)
+            (setq end (1- mid)))))
+      (elt vec start))))
 
 (defun emt--lowerbound (pred vec)
-  "Binary search to find the first element in LIST satisfying PRED."
+  "Binary search to find the first element in VEC satisfying PRED."
   (if (null vec) nil
-    (setq start 0)
-    (setq end (1- (length vec)))
-    (while (< start end)
-      (let ((mid (ash (+ start end) -1)))
-        (if (funcall pred (elt vec mid))
-            (setq end mid)
-          (setq start (1+ start)))))
-    (elt vec end)))
+    (let ((start 0)
+          (end (1- (length vec))))
+      (while (< start end)
+        (let ((mid (ash (+ start end) -1)))
+          (if (funcall pred (elt vec mid))
+              (setq end mid)
+            (setq start (1+ start)))))
+      (elt vec end))))
 
 (defun emt--move-by-word (direction)
+  "Move point by word.
+
+If DIRECTION is `'forward', move point forward by word.
+If DIRECTION is `'backward', move point backward by word."
   (let* ((bounds-at-point (emt--get-bounds-at-point direction))
          (beg (car bounds-at-point))
          (end (cdr bounds-at-point)))
