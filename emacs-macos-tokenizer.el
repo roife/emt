@@ -44,7 +44,7 @@
   :type 'boolean
   :group 'emacs-macos-tokenizer)
 
-(defcustom emt-lib-path (concat user-emacs-directory "modules/libemacs-macos-tokenizer.dylib")
+(defcustom emt-lib-path (concat user-emacs-directory "modules/libemacsMacOSTokenizer" module-file-suffix)
   "The path to the directory of dynamic library for emacs-macos-tokenizer.
 
 Leave it nil if you have the dynamic library in the standard path. Otherwise
@@ -230,7 +230,7 @@ If DIRECTION is `'backward', move point backward by word."
   t)
 
 ;;;###autoload
-(defun emt--compiler-module ()
+(defun emt-compiler-module (&optional path)
   "Compile dynamic module."
   (interactive)
   (unless (eq system-type 'darwin)
@@ -239,9 +239,16 @@ If DIRECTION is `'backward', move point backward by word."
     (error "Variable `module-file-suffix' is nil"))
   (unless (executable-find "swift")
     (error "Swift compiler not found"))
-  (let ((default-directory emt--root))
-    (if (zerop (shell-command "swift build "))
-        (message "Compile succeed!")
+  (unless (file-directory-p (concat emt--root "module/"))
+    (error "No module source found"))
+
+  (setq path (or path emt-lib-path))
+  (let ((default-directory (concat emt--root "module/")))
+    (if (zerop (shell-command "swift build -c release"))
+        (progn (message "Compile succeed!")
+               (make-directory (file-name-directory path) t)
+               (copy-file (concat emt--root "module/.build/release/libemacsMacOSTokenizer" module-file-suffix)
+                          path t))
       (error "Compile dynamic module failed"))))
 
 ;;;###autoload
