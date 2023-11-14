@@ -296,6 +296,7 @@ Set mark ARG words from point or move mark one word."
 ;;;###autoload
 (defun emt-ensure ()
   "Load the dynamic library."
+  (interactive)
   (unless emt--lib-loaded
     (if (not (file-exists-p emt-lib-path))
         (error "No compiled dynamic module found")
