@@ -32,6 +32,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'thingatpt))
+(eval-when-compile (require 'subr-x))
 
 ;;; Customize
 
@@ -85,6 +86,7 @@
 
 (defun emt--cache-get (key)
   "Get the value of KEY in cache."
+  (setq key (string-trim (substring-no-properties key) "\\W*" "\\W*"))
   (let ((value (gethash key emt--cache-set)))
     (when value
       (setq emt--cache-lru-list (delete key emt--cache-lru-list))
@@ -93,6 +95,7 @@
 
 (defun emt--cache-put (key value)
   "Put KEY and VALUE into cache."
+  (setq key (string-trim (substring-no-properties key) "\\W*" "\\W*"))
   (puthash key value emt--cache-set)
   (push key emt--cache-lru-list)
   (when (> (length emt--cache-lru-list) emt--cache-lru-size)
