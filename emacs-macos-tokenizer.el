@@ -95,39 +95,6 @@ you should set this to where you put the dynamic library."
   (when (> (length emt--cache-lru-list) emt--cache-lru-size)
     (setq emt--cache-lru-list (butlast emt--cache-lru-list))))
 
-(defun emt-ensure ()
-  "Load the dynamic library."
-  (unless emt--lib-loaded
-    (if (not (file-exists-p emt-lib-path))
-        (error "No compiled dynamic module found")
-      (load-file emt-lib-path)
-      (dolist (fn emt--lib-fns)
-        (unless (fboundp fn)
-          (error "No %s function found in dynamic module" fn)))
-      (setq emt--lib-loaded t))))
-
-(defun emt-split (str)
-  "Split STR into a list of words.
-
-Return a list of cons, each of which has a word and its bound."
-  (if emt--lib-loaded
-      (if-let ((cached (and emt-use-cache (emt--cache-get str))))
-          cached
-          (let ((result (emt--do-split-helper str)))
-            (when emt-use-cache (emt--cache-put str result))
-            result))
-    (error "Dynamic module not loaded")))
-
-(defun emt-split-without-bounds (str)
-  "Split STR into a list of words. Just return a list of word."
-  (if emt--lib-loaded
-      (if-let ((cached (and emt-use-cache (emt--cache-get str))))
-          (mapcar #'car cached)
-        (let ((result (emt--do-split-without-bounds-helper str)))
-          (when emt-use-cache (emt--cache-put str (cons result nil)))
-          result))
-    (error "Dynamic module not loaded")))
-
 (defun emt--get-bounds-at-point (direction)
   "Get the bounds of the CJK string at point.
 
@@ -167,18 +134,6 @@ If BACK is non-nil, return the word backward."
     (if (eq word-beg word-end)
         (word-at-point)
       (buffer-substring (+ beg word-beg) (+ beg word-end)))))
-
-(defun emt-word-at-point-or-forward ()
-  "Return the word at point.
-
-If current point is at bound of a word, return the one forward."
-  (emt--word-at-point-helper nil))
-
-(defun emt-word-at-point-or-backward ()
-  "Return the word at point.
-
-If current point is at bound of a word, return the one backward."
-  (emt--word-at-point-helper t))
 
 (defun emt--upperbound (pred vec)
   "Binary search to find the last element in VEC satisfying PRED."
@@ -228,6 +183,44 @@ If DIRECTION is `'backward', move point backward by word."
                      (goto-char (+ beg (cadr target-bound)))
                    (backward-word)))))))
   t)
+
+(defun emt-split (str)
+  "Split STR into a list of words.
+
+Return a list of cons, each of which has a word and its bound."
+  (if emt--lib-loaded
+      (if-let ((cached (and emt-use-cache (emt--cache-get str))))
+          cached
+          (let ((result (emt--do-split-helper str)))
+            (when emt-use-cache (emt--cache-put str result))
+            result))
+    (error "Dynamic module not loaded")))
+
+(defun emt-split-without-bounds (str)
+  "Split STR into a list of words. Just return a list of word."
+  (if emt--lib-loaded
+      (if-let ((cached (and emt-use-cache (emt--cache-get str))))
+          (mapcar #'car cached)
+        (let ((result (emt--do-split-without-bounds-helper str)))
+          (when emt-use-cache (emt--cache-put str (cons result nil)))
+          result))
+    (error "Dynamic module not loaded")))
+
+;;;###autoload
+(defun emt-word-at-point-or-forward ()
+  "Return the word at point.
+
+If current point is at bound of a word, return the one forward."
+  (interactive)
+  (emt--word-at-point-helper nil))
+
+;;;###autoload
+(defun emt-word-at-point-or-backward ()
+  "Return the word at point.
+
+If current point is at bound of a word, return the one backward."
+  (interactive)
+  (emt--word-at-point-helper t))
 
 ;;;###autoload
 (defun emt-compiler-module (&optional path)
@@ -299,6 +292,18 @@ Set mark ARG words from point or move mark one word."
   (interactive "p")
   (set-mark (point))
   (emt-forward-word arg))
+
+;;;###autoload
+(defun emt-ensure ()
+  "Load the dynamic library."
+  (unless emt--lib-loaded
+    (if (not (file-exists-p emt-lib-path))
+        (error "No compiled dynamic module found")
+      (load-file emt-lib-path)
+      (dolist (fn emt--lib-fns)
+        (unless (fboundp fn)
+          (error "No %s function found in dynamic module" fn)))
+      (setq emt--lib-loaded t))))
 
 ;;; Minor mode
 
