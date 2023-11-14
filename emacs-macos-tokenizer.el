@@ -5,7 +5,7 @@
 ;; Author: Roife Wu <roifewu@gmail.com>
 ;; URL: https://github.com/cireu/jieba.el
 ;; Version: 0.0.1
-;; Package-Requires: ((emacs "25.2"))
+;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: chinese, cjk, tokenizer, macos, mac, natural language, segmentation
 
 ;; This file is NOT a part of GNU Emacs.
