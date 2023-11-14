@@ -8,13 +8,12 @@ This package use macOS's built-in NLP tokenizer to tokenize and operate on CJK w
 
 *** Requirements
 
-This package requires macOS 10.15 or later.
-
-This package also requires Emacs 26.1 or later, built with dynamic module support (i.e. use =--with-modules= while compilation Emacs).
+- macOS 10.15 or later
+- Emacs 26.1 or later, built with dynamic module support (use =--with-modules= during compilation)
 
 *** Install package
 
-Install with `straight` and `use-package`:
+Install with =straight= and =use-package=:
 
 #+begin_src emacs-lisp
   (use-package emacs-macos-tokenizer
@@ -24,12 +23,22 @@ Install with `straight` and `use-package`:
 
 *** Build dynamic module
 
-You can download pre-built module from [[https://github.com/roife/emacs-macos-tokenizer/releases][releases]], or build it yourself with the following step:
+**** Pre-built (recommendation)
+
+Retrieve the pre-built module from the [[https://github.com/roife/emacs-macos-tokenizer/releases][releases]] section and place the =dylib= file in the =emacs-macos-tokenizer-lib-path= (by default, it is located at =modules/libemacsMacOSTokenizer.dylib= within your personal configuration folder, normally =~/.emacs.d/modules/libemacsMacOSTokenizer.dylib=).
+
+**** Manually build
 
 - Install Xcode.
-- Build the module with `emacs-macos-tokenizer-compile-module`, which compiles and copy the module to =emacs-macos-tokenizer-lib-path=.
+- Build the module using =emacs-macos-tokenizer-compile-module=, which compiles and copies the module to =emacs-macos-tokenizer-lib-path=.
 
-If you enconter the error =No such module "PackageDescription"=, you should run the following command and try again:
+If you enconter the folloing error,
+
+#+begin_quote
+No such module "PackageDescription"
+#+end_quote
+
+run the following command and try again:
 
 #+begin_src bash
   sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
@@ -81,26 +90,26 @@ Load dynamic module.
 
 **** =emacs-macos-tokenizer-forward-word=
 
-CJK compatible version of `forward-word'.
+CJK compatible version of =forward-word=.
 
 **** =emacs-macos-tokenizer-backward-word=
 
-CJK compatible version of `backward-word'.
+CJK compatible version of =backward-word=.
 
 **** =emacs-macos-tokenizer-kill-word=
 
-CJK compatible version of `kill-word'.
+CJK compatible version of =kill-word=.
 
 **** =emacs-macos-tokenizer-backward-kill-word=
 
-CJK compatible version of `backward-kill-word'.
+CJK compatible version of =backward-kill-word=.
 
 **** =emacs-macos-tokenizer-mark-word=
 
-CJK compatible version of `mark-word'.
+CJK compatible version of =mark-word=.
 
 ** Acknowledgements
 
-This package is inspired by [[https://github.com/cireu/jieba.el/][jieba.el]] which is a Chinese tokenizer for Emacs using `jieba`.
+This package is inspired by [[https://github.com/cireu/jieba.el/][jieba.el]] which is a Chinese tokenizer for Emacs using =jieba=.
 
 The dynamic module uses [[https://github.com/SavchenkoValeriy/emacs-swift-module.git][emacs-swift-module]], which provides an interface for writing Emacs dynamic modules in Swift.
