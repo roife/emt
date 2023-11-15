@@ -46,7 +46,7 @@
   :type 'boolean
   :group 'emt)
 
-(defcustom emt--cache-lru-size 50
+(defcustom emt-cache-lru-size 50
   "The size of LRU cache for tokenization results."
   :type 'integer
   :group 'emt)
