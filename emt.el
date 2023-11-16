@@ -58,7 +58,7 @@
 
 ;;; Export function
 
-(defconst emt-version "1.0")
+(defconst emt-version "v2.0.0")
 
 (defvar emt--root (file-name-directory (or load-file-name buffer-file-name))
   "The path to the root of the package.")
@@ -236,8 +236,23 @@ If current point is at bound of a word, return the one backward."
   (emt--word-at-point t))
 
 ;;;###autoload
+(defun emt-download-module (&optional path)
+  "Download dynamic module from https://github.com/roife/emt/releases/download/<VERSION>/libEMT.dylib.
+
+If PATH is non-nil, download the module to PATH."
+    (interactive)
+    (unless (eq system-type 'darwin)
+      (error "Only support macOS"))
+    (setq path (or path emt-lib-path))
+    (make-directory (file-name-directory path) t)
+    (let ((url (format "https://github.com/roife/emt/releases/download/%s/libEMT.dylib" emt-version)))
+      (url-copy-file url path t)))
+
+;;;###autoload
 (defun emt-compile-module (&optional path)
-  "Compile dynamic module."
+  "Compile dynamic module.
+
+If PATH is non-nil, compile the module to PATH."
   (interactive)
   (unless (eq system-type 'darwin)
     (error "Only support macOS"))
@@ -317,8 +332,11 @@ Set mark ARG words from point or move mark one word."
   (interactive)
   (unless emt--lib-loaded
     (unless (file-exists-p emt-lib-path)
-      (when (yes-or-no-p "EMT module not found. Compile it (Xcode needed)?")
-        (emt-compile-module)))
+      (if (yes-or-no-p "EMT module not found. Download pre-built from GitHub?")
+          (emt-download-module)
+        (if (yes-or-no-p "Compile EMT module from source?")
+            (emt-compile-module)
+          (error "EMT module cannot be loaded"))))
     (load-file emt-lib-path)
     (dolist (fn emt--lib-fns)
       (unless (fboundp fn)
