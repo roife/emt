@@ -44,7 +44,8 @@ Install with =straight= and =use-package=:
 
 #+begin_src emacs-lisp
   (use-package emt
-    :straight (:host github :repo "roife/emt")
+    :straight (:host github :repo "roife/emt"
+                     :files ("*.el" "module/*" "module"))
     :hook (after-init . emt-mode))
 #+end_src
 

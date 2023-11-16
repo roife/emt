@@ -247,6 +247,11 @@ If current point is at bound of a word, return the one backward."
     (error "Swift compiler not found"))
   (unless (file-directory-p (concat emt--root "module/"))
     (error "No module source found"))
+  (unless (file-exists-p "/Applications/Xcode.app")
+    (error "Xcode not found. You can download pre-compiled module from GitHub."))
+
+  (shell-command (concat "echo " (shell-quote-argument (read-passwd "sudo password (required by compiling EMT):"))
+                         " | sudo -S xcode-select --switch /Applications/Xcode.app/Contents/Developer"))
 
   (setq path (or path emt-lib-path))
   (let ((default-directory (concat emt--root "module/")))
@@ -311,13 +316,14 @@ Set mark ARG words from point or move mark one word."
   "Load the dynamic library."
   (interactive)
   (unless emt--lib-loaded
-    (if (not (file-exists-p emt-lib-path))
-        (error "No compiled dynamic module found")
-      (load-file emt-lib-path)
-      (dolist (fn emt--lib-fns)
-        (unless (fboundp fn)
-          (error "No %s function found in dynamic module" fn)))
-      (setq emt--lib-loaded t))))
+    (unless (file-exists-p emt-lib-path)
+      (when (yes-or-no-p "EMT module not found. Compile it (Xcode needed)?")
+        (emt-compile-module)))
+    (load-file emt-lib-path)
+    (dolist (fn emt--lib-fns)
+      (unless (fboundp fn)
+        (error "No %s function found in dynamic module" fn)))
+    (setq emt--lib-loaded t)))
 
 ;;; Minor mode
 
