@@ -111,7 +111,7 @@
     (setq key (string-trim (substring-no-properties key) "\\W*" "\\W*"))
     (puthash key value emt--cache-set)
     (push key emt--cache-lru-list)
-    (when (> (length emt--cache-lru-list) emt--cache-lru-size)
+    (when (> (length emt--cache-lru-list) emt-cache-lru-size)
       (setq emt--cache-lru-list (butlast emt--cache-lru-list)))))
 
 (defun emt--get-bounds-at-point (direction)
