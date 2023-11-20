@@ -17,7 +17,7 @@ This package use macOS's built-in NLP tokenizer to tokenize and operate on CJK w
 
 **** Pre-built (recommendation)
 
-When you first enable =emt-mode=, if the module cannot be found, it will prompt whether to automatically download it from GitHub. Or you can manually retrieve the pre-built module from the [[https://github.com/roife/emacs-macos-tokenizer/releases][releases]] section and place the =dylib= file in the =emacs-macos-tokenizer-lib-path= (by default, it is located at =modules/libEMT.dylib= within your personal configuration folder, normally =~/.emacs.d/modules/libEMT.dylib=).
+If you enable =emt-mode= and the module cannot be found, it will prompt whether to automatically download it from GitHub. Or you can manually retrieve the pre-built module from the [[https://github.com/roife/emacs-macos-tokenizer/releases][releases]] section and place the =dylib= file in the =emacs-macos-tokenizer-lib-path= (by default, it is located at =modules/libEMT.dylib= within your personal configuration folder, normally =~/.emacs.d/modules/libEMT.dylib=).
 
 *Current version of the dynamic module is v2.0.0, make sure you have updated to latest module.*
 
@@ -88,6 +88,12 @@ Return the word at point. If current point is at bound of a word, return the one
 Compile and copy the module to =emt-lib-path=.
 
 It takes an optional argument =path=, which is the path to the directory of dynamic library. By default, =path= is set to =emt-lib-path=.
+
+**** =emt-download-module=
+
+Download dynamic module from  =https://github.com/roife/emt/releases/download/<VERSION>/libEMT.dylib=.
+
+If PATH is non-nil, download the module to PATH.
 
 **** =emt-ensure=
 
