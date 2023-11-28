@@ -190,21 +190,20 @@ If BACK is non-nil, return the word backward."
 
 If DIRECTION is `'forward', move point forward by word.
 If DIRECTION is `'backward', move point backward by word."
-  (pcase-let ((for-p (eq direction 'forward))
+  (pcase-let ((forward-p (eq direction 'forward))
               (`(,beg . ,end) (emt--get-bounds-at-point
                                (emt--move-by-word-decide-bounds-direction direction))))
     (if (eq beg end)
-        (if for-p (forward-word) (backward-word))
+        (if forward-p (forward-word) (backward-word))
       (let* ((text (buffer-substring-no-properties beg end))
              (pos (- (point) beg))
-             (pred (if for-p (lambda (x) (> x pos)) (lambda (x) (< x pos))))
-             (target-bound (funcall (if for-p #'emt--lowerbound #'emt--upperbound)
+             (pred (if forward-p (lambda (x) (> x pos)) (lambda (x) (< x pos))))
+             (target-bound (funcall (if forward-p #'emt--lowerbound #'emt--upperbound)
                                     pred
-                                    (mapcar (if for-p #'cdr #'car) (emt-split text)))))
+                                    (mapcar (if forward-p #'cdr #'car) (emt-split text)))))
         (if (and target-bound (funcall pred target-bound))
             (goto-char (+ beg target-bound))
-          (if for-p (forward-word) (backward-word))))))
-  t)
+          (if forward-p (forward-word) (backward-word)))))))
 
 (defun emt-split (str)
   "Split STR into a list of words.
@@ -285,9 +284,12 @@ Move point forward ARG words (backward if ARG is negative).
 If ARG is omitted or nil, move point forward one word."
   (interactive "p")
   (setq arg (or arg 1))
-  (let ((direction (if (< arg 0) 'backward 'forward)))
-    (dotimes (_ (abs arg))
-      (emt--move-by-word direction))))
+  (let ((direction (if (< arg 0) 'backward 'forward))
+        (count (abs arg))
+        (i 0))
+    (while (and (< i count) (emt--move-by-word direction))
+      (setq i (1+ i)))
+    (eq i count)))
 
 ;;;###autoload
 (defun emt-backward-word (&optional arg)
