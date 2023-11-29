@@ -356,6 +356,8 @@ Set mark ARG words from point or move mark one word."
     (define-key map [remap backward-word] #'emt-backward-word)
     (define-key map [remap kill-word] #'emt-kill-word)
     (define-key map [remap backward-kill-word] #'emt-backward-kill-word)
+    (define-key map [remap mark-word] #'emt-mark-word)
+    (define-key map [remap word-at-point] #'emt-word-at-point-or-forward)
     map))
 
 ;;;###autoload
