@@ -3,7 +3,7 @@
 ;; Copyright (C) 2023 Roife Wu
 
 ;; Author: Roife Wu <roifewu@gmail.com>
-;; URL: https://github.com/cireu/jieba.el
+;; URL: https://github.com/roife/emt
 ;; Version: 2.0.0
 ;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: chinese, cjk, tokenizer, macos, mac, natural language, segmentation
@@ -176,7 +176,9 @@ If BACK is non-nil, return the word backward."
       (elt vec end))))
 
 (defun emt--move-by-word-decide-bounds-direction (direction)
-  "Decide the direction when moving by word."
+  "Decide the direction when moving by word.
+
+DIRECTION is the direction of moving by word."
   (if (eq direction 'forward)
       (if (and (char-after) (string-match "\\W" (char-to-string (char-after))))
           'forward
@@ -236,7 +238,7 @@ If current point is at bound of a word, return the one backward."
 
 ;;;###autoload
 (defun emt-download-module (&optional path)
-  "Download dynamic module from https://github.com/roife/emt/releases/download/<VERSION>/libEMT.dylib.
+  "Download dynamic module from GitHub release.
 
 If PATH is non-nil, download the module to PATH."
     (interactive)
@@ -262,7 +264,7 @@ If PATH is non-nil, compile the module to PATH."
   (unless (file-directory-p (concat emt--root "module/"))
     (error "No module source found"))
   (unless (file-exists-p "/Applications/Xcode.app")
-    (error "Xcode not found. You can download pre-compiled module from GitHub."))
+    (error "Xcode not found. You can download pre-compiled module from GitHub"))
 
   (shell-command (concat "echo " (shell-quote-argument (read-passwd "sudo password (required by compiling EMT):"))
                          " | sudo -S xcode-select --switch /Applications/Xcode.app/Contents/Developer"))
