@@ -14,7 +14,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/SavchenkoValeriy/emacs-swift-module.git", revision: "c776706c9338b8ba72a76a2128fd89bd4ac4269e")
+    .package(url: "https://github.com/SavchenkoValeriy/emacs-swift-module.git", branch: "main")
   ],
   targets: [
     .target(
