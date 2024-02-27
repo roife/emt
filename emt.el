@@ -58,7 +58,7 @@
 
 ;;; Export function
 
-(defconst emt-version "v2.0.0")
+(defconst emt-version "v2.1.0")
 
 (defvar emt--root (file-name-directory (or load-file-name buffer-file-name))
   "The path to the root of the package.")
@@ -220,6 +220,14 @@ position of a word)"
           result))
     (error "Dynamic module not loaded")))
 
+(defun emt-get-arch ()
+  (cond
+   ((string-match-p "aarch64" system-configuration)
+    "aarch64")
+   ((string-match-p "x86_64" system-configuration)
+    "x86_64"))
+  )
+
 ;;;###autoload
 (defun emt-word-at-point-or-forward ()
   "Return the word at point.
@@ -243,10 +251,11 @@ If current point is at bound of a word, return the one backward."
 If PATH is non-nil, download the module to PATH."
     (interactive)
     (unless (eq system-type 'darwin)
-      (error "Only support macOS"))
+      (error "EMT only support macOS"))
     (setq path (or path emt-lib-path))
     (make-directory (file-name-directory path) t)
-    (let ((url (format "https://github.com/roife/emt/releases/download/%s/libEMT.dylib" emt-version)))
+    (let* ((arch (emt-get-arch))
+           (url (format "https://github.com/roife/emt/releases/download/%s/libEMT-%s.dylib" emt-version arch)))
       (url-copy-file url path t)))
 
 ;;;###autoload
