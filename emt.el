@@ -225,7 +225,9 @@ position of a word)"
    ((string-match-p "aarch64" system-configuration)
     "aarch64")
    ((string-match-p "x86_64" system-configuration)
-    "x86_64"))
+    "x86_64")
+   (t
+    (error "Unknow architecture")))
   )
 
 ;;;###autoload
