@@ -125,6 +125,10 @@ CJK compatible version of =backward-kill-word=.
 
 CJK compatible version of =mark-word=.
 
+** Alternatives
+
+- https://github.com/Master-Hash/ewt-rs : Tokenizer for Windows via WinRT API/ICU, also cross-platform capable.
+
 ** Acknowledgements
 
 This package is inspired by [[https://github.com/cireu/jieba.el/][jieba.el]] which is a Chinese tokenizer for Emacs using =jieba=.
