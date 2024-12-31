@@ -295,7 +295,7 @@ If PATH is non-nil, compile the module to PATH."
 
 Move point forward ARG words (backward if ARG is negative).
 If ARG is omitted or nil, move point forward one word."
-  (interactive "p")
+  (interactive "^p")
   (setq arg (or arg 1))
   (let ((direction (if (< arg 0) 'backward 'forward))
         (count (abs arg))
@@ -310,7 +310,7 @@ If ARG is omitted or nil, move point forward one word."
 
 Move point backward ARG words (forward if ARG is negative).
 If ARG is omitted or nil, move point forward one word."
-  (interactive "p")
+  (interactive "^p")
   (setq arg (or arg 1))
   (emt-forward-word (- arg)))
 
