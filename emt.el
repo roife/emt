@@ -4,7 +4,7 @@
 
 ;; Author: Roife Wu <roifewu@gmail.com>
 ;; URL: https://github.com/roife/emt
-;; Version: 2.1.1
+;; Version: 2.1.2
 ;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: chinese, cjk, tokenizer, macos, mac, natural language, segmentation
 
@@ -58,10 +58,24 @@
 
 ;;; Export function
 
-(defconst emt-version "v2.1.1")
+(defconst emt-version "v2.1.2")
+
+(defconst emt--swift-module-lib-name "libEmacsSwiftModuleDynamic")
 
 (defvar emt--root (file-name-directory (or load-file-name buffer-file-name))
   "The path to the root of the package.")
+
+(defun emt--swift-module-lib-path (&optional path)
+  "Return the path of the shared Swift module library for PATH."
+  (expand-file-name (concat emt--swift-module-lib-name module-file-suffix)
+                    (file-name-directory (or path emt-lib-path))))
+
+(defun emt--built-lib-path (lib-name)
+  "Return the built release path for LIB-NAME."
+  (let ((bin-path (replace-regexp-in-string
+                   "\n\\'" ""
+                   (shell-command-to-string "swift build -c release --show-bin-path"))))
+    (expand-file-name (concat lib-name module-file-suffix) bin-path)))
 
 (defvar emt--cjk-regex-forward (format "\\(\\cc\\|\\cj\\|\\ch\\)+\\W*$")
   "Forward regex for CJK.")
@@ -257,7 +271,11 @@ If PATH is non-nil, download the module to PATH."
     (setq path (or path emt-lib-path))
     (make-directory (file-name-directory path) t)
     (let* ((arch (emt-get-arch))
-           (url (format "https://github.com/roife/emt/releases/download/%s/libEMT-%s.dylib" emt-version arch)))
+           (url (format "https://github.com/roife/emt/releases/download/%s/libEMT-%s.dylib" emt-version arch))
+           (swift-module-path (emt--swift-module-lib-path path))
+           (swift-module-url (format "https://github.com/roife/emt/releases/download/%s/%s-%s.dylib"
+                                     emt-version emt--swift-module-lib-name arch)))
+      (url-copy-file swift-module-url swift-module-path t)
       (url-copy-file url path t)))
 
 ;;;###autoload
@@ -285,8 +303,10 @@ If PATH is non-nil, compile the module to PATH."
     (if (zerop (shell-command "swift build -c release"))
         (progn (message "Compile succeed!")
                (make-directory (file-name-directory path) t)
-               (copy-file (concat emt--root "module/.build/release/libEMT" module-file-suffix)
-                          path t))
+               (copy-file (emt--built-lib-path "libEMT") path t)
+               (copy-file (emt--built-lib-path emt--swift-module-lib-name)
+                          (emt--swift-module-lib-path path)
+                          t))
       (error "Compile dynamic module failed"))))
 
 ;;;###autoload

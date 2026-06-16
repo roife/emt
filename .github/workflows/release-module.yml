@@ -52,8 +52,10 @@ jobs:
 
           mkdir -p dist
           cp .build/aarch64/arm64-apple-macosx/release/libEMT.dylib dist/libEMT-aarch64.dylib
+          cp .build/aarch64/arm64-apple-macosx/release/libEmacsSwiftModuleDynamic.dylib dist/libEmacsSwiftModuleDynamic-aarch64.dylib
 
           lipo -info dist/libEMT-aarch64.dylib
+          lipo -info dist/libEmacsSwiftModuleDynamic-aarch64.dylib
 
       - name: Publish release assets
         env:
@@ -68,11 +70,13 @@ jobs:
             gh release upload "${RELEASE_TAG}" \
               --repo "${GITHUB_REPOSITORY}" \
               dist/libEMT-aarch64.dylib \
+              dist/libEmacsSwiftModuleDynamic-aarch64.dylib \
               --clobber
           else
             gh release create "${RELEASE_TAG}" \
               --repo "${GITHUB_REPOSITORY}" \
               --title "${RELEASE_TAG}" \
               --notes "${release_notes}" \
-              dist/libEMT-aarch64.dylib
+              dist/libEMT-aarch64.dylib \
+              dist/libEmacsSwiftModuleDynamic-aarch64.dylib
           fi

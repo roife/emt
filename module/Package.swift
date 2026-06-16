@@ -14,13 +14,13 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/SavchenkoValeriy/emacs-swift-module.git", branch: "main")
+    .package(url: "https://github.com/SavchenkoValeriy/emacs-swift-module.git", exact: "1.3.5")
   ],
   targets: [
     .target(
       name: "EMT",
       dependencies: [
-        .product(name: "EmacsSwiftModule", package: "emacs-swift-module")
+        .product(name: "EmacsSwiftModuleDynamic", package: "emacs-swift-module")
       ],
       plugins: [
         .plugin(name: "ModuleFactoryPlugin", package: "emacs-swift-module")
