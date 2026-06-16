@@ -4,7 +4,7 @@
 
 ;; Author: Roife Wu <roifewu@gmail.com>
 ;; URL: https://github.com/roife/emt
-;; Version: 2.0.0
+;; Version: 2.1.1
 ;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: chinese, cjk, tokenizer, macos, mac, natural language, segmentation
 
@@ -58,7 +58,7 @@
 
 ;;; Export function
 
-(defconst emt-version "v2.1.0")
+(defconst emt-version "v2.1.1")
 
 (defvar emt--root (file-name-directory (or load-file-name buffer-file-name))
   "The path to the root of the package.")
