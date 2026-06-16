@@ -1,0 +1,78 @@
+name: Build and Release Module
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to build and publish, for example v2.1.0"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-module-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-release:
+    name: Build and release aarch64 macOS dylib
+    runs-on: macos-14
+    defaults:
+      run:
+        working-directory: module
+
+    steps:
+      - name: Checkout requested tag
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag }}
+
+      - name: Checkout pushed tag
+        if: github.event_name != 'workflow_dispatch'
+        uses: actions/checkout@v4
+
+      - name: Show Swift toolchain
+        run: |
+          swift --version
+          xcodebuild -version
+          uname -a
+
+      - name: Build aarch64 library
+        run: swift build -c release --triple arm64-apple-macosx10.15 --scratch-path .build/aarch64
+
+      - name: Prepare release assets
+        run: |
+          set -euo pipefail
+
+          mkdir -p dist
+          cp .build/aarch64/arm64-apple-macosx/release/libEMT.dylib dist/libEMT-aarch64.dylib
+
+          lipo -info dist/libEMT-aarch64.dylib
+
+      - name: Publish release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+
+          release_notes="See https://github.com/roife/emt#pre-built-recommendation"
+
+          if gh release view "${RELEASE_TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh release upload "${RELEASE_TAG}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              dist/libEMT-aarch64.dylib \
+              --clobber
+          else
+            gh release create "${RELEASE_TAG}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --title "${RELEASE_TAG}" \
+              --notes "${release_notes}" \
+              dist/libEMT-aarch64.dylib
+          fi
